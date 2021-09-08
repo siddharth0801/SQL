@@ -1,0 +1,17 @@
+Hotwax_SQL=# select * from Salespeople;
+ snum |  sname  |   city    | comm
+------+---------+-----------+------
+ 1001 | Peel    | London    |   12
+ 1002 | Serres  | Sanjose   |   13
+ 1004 | Motika  | London    |   11
+ 1007 | Rifkin  | Barcelona |   15
+ 1003 | AxelRod | New York  |   10
+ 1008 | Fran    | London    |   25
+
+Hotwax_SQL=# select * from Customers where rating=100;
+ cnum |  cname  |  city  | rating | snum
+------+---------+--------+--------+------
+ 2001 | Hoffman | London |    100 | 1001
+ 2006 | Clemens | London |    100 | 1001
+ 2007 | Pereira | Rome   |    100 | 1004
+
