@@ -15,3 +15,83 @@ Hotwax_SQL=# select * from Customers where rating=100;
  2006 | Clemens | London |    100 | 1001
  2007 | Pereira | Rome   |    100 | 1004
 
+Hotwax_SQL=# select snum,sname,odate,Max(amt) from Salespeople Natural Join Orders group by snum,odate order by snum;
+ snum |  sname  |   odate    |   max
+------+---------+------------+---------
+ 1001 | Peel    | 1990-03-10 |  767.19
+ 1001 | Peel    | 1990-05-10 |    4723
+ 1001 | Peel    | 1990-06-10 | 9891.88
+ 1002 | Serres  | 1990-03-10 | 5160.45
+ 1002 | Serres  | 1990-04-10 |   75.75
+ 1002 | Serres  | 1990-06-10 | 1309.95
+ 1003 | AxelRod | 1990-04-10 | 1713.23
+ 1004 | Motika  | 1990-03-10 |  1900.1
+ 1007 | Rifkin  | 1990-03-10 | 1098.16
+(9 rows)
+
+Hotwax_SQL=# select * from Orders order by cnum DESC;
+ onum |   amt   |   odate    | cnum | snum
+------+---------+------------+------+------
+ 3006 | 1098.16 | 1990-03-10 | 2008 | 1007
+ 3001 |   18.69 | 1990-03-10 | 2008 | 1007
+ 3002 |  1900.1 | 1990-03-10 | 2007 | 1004
+ 3011 | 9891.88 | 1990-06-10 | 2006 | 1001
+ 3008 |    4723 | 1990-05-10 | 2006 | 1001
+ 3007 |   75.75 | 1990-04-10 | 2004 | 1002
+ 3010 | 1309.95 | 1990-06-10 | 2004 | 1002
+ 3005 | 5160.45 | 1990-03-10 | 2003 | 1002
+ 3009 | 1713.23 | 1990-04-10 | 2002 | 1003
+ 3003 |  767.19 | 1990-03-10 | 2001 | 1001
+(10 rows)
+
+Hotwax_SQL=# select DISTINCT(sname) from Salespeople Natural Join Orders;
+  sname
+---------
+ Rifkin
+ Motika
+ Serres
+ Peel
+ AxelRod
+(5 rows)
+
+Hotwax_SQL=# select cname from Customers;
+  cname
+----------
+ Hoffman
+ Giovanni
+ Liu
+ Grass
+ Clemens
+ Cisneros
+ Pereira
+(7 rows)
+
+Hotwax_SQL=# select S.snum,S.sname from Salespeople as S, Customers as C where S.snum=C.snum group by S.snum having count(cnum)>1;
+ snum | sname
+------+--------
+ 1002 | Serres
+ 1001 | Peel
+(2 rows)
+
+Hotwax_SQL=# select sname,count(onum) from Salespeople Natural Join Orders group by snum order by count(onum) DESC;
+  sname  | count
+---------+-------
+ Serres  |     3
+ Peel    |     3
+ Rifkin  |     2
+ AxelRod |     1
+ Motika  |     1
+(5 rows)
+
+Hotwax_SQL=# select * from Customers where exists(select city from Customers where city='SanJose');
+ cnum |  cname   |  city   | rating | snum
+------+----------+---------+--------+------
+ 2001 | Hoffman  | London  |    100 | 1001
+ 2002 | Giovanni | Rome    |    200 | 1003
+ 2003 | Liu      | SanJose |    200 | 1002
+ 2004 | Grass    | Berlin  |    300 | 1002
+ 2006 | Clemens  | London  |    100 | 1001
+ 2008 | Cisneros | SanJose |    300 | 1007
+ 2007 | Pereira  | Rome    |    100 | 1004
+(7 rows)
+
