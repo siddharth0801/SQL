@@ -141,6 +141,54 @@ Hotwax_SQL=# select * from Orders where odate='03/10/1990';
 Hotwax_SQL=# select odate,Sum(amt) from Orders group by odate having Sum(amt)>=Max(amt)+2000;
    odate    |   sum
 ------------+---------
- 1990-03-10 | 8944.59
+ 1990-10-03 | 8944.59
 (1 row)
+
+Hotwax_SQL=# select * from Orders where amt>ANY(select amt from Orders where odate='06/10/1990');
+ onum |   amt   |   odate    | cnum | snum
+------+---------+------------+------+------
+ 3002 |  1900.1 | 1990-10-03 | 2007 | 1004
+ 3005 | 5160.45 | 1990-10-03 | 2003 | 1002
+ 3009 | 1713.23 | 1990-10-04 | 2002 | 1003
+ 3008 |    4723 | 1990-10-05 | 2006 | 1001
+ 3011 | 9891.88 | 1990-10-06 | 2006 | 1001
+(5 rows)
+
+Hotwax_SQL=# select * from Customers where cnum>1000+(select snum from Salespeople where sname='Serres');
+ cnum |  cname   |  city   | rating | snum
+------+----------+---------+--------+------
+ 2003 | Liu      | SanJose |    200 | 1002
+ 2004 | Grass    | Berlin  |    300 | 1002
+ 2006 | Clemens  | London  |    100 | 1001
+ 2008 | Cisneros | SanJose |    300 | 1007
+ 2007 | Pereira  | Rome    |    100 | 1004
+(5 rows)
+
+Hotwax_SQL=# select sname,concat(comm,'%') as comm from Salespeople;
+  sname  | comm
+---------+------
+ Peel    | 12%
+ Motika  | 11%
+ Rifkin  | 15%
+ AxelRod | 10%
+ Fran    | 25%
+ Serres  | 13%
+(6 rows)
+
+Hotwax_SQL=# select snum,sname,odate,Max(amt) as LargestOrder from Salespeople Natural Join Orders group by snum,odate having Max(amt)>3000;
+ snum | sname  |   odate    | largestorder
+------+--------+------------+--------------
+ 1001 | Peel   | 1990-10-06 |      9891.88
+ 1002 | Serres | 1990-10-03 |      5160.45
+ 1001 | Peel   | 1990-10-05 |         4723
+(3 rows)
+
+Hotwax_SQL=# select snum,sname,Max(amt) from Salespeople Natural Join Orders where odate='03/10/1990' group by snum;
+ snum | sname  |   max
+------+--------+---------
+ 1001 | Peel   |  767.19
+ 1002 | Serres | 5160.45
+ 1004 | Motika |  1900.1
+ 1007 | Rifkin | 1098.16
+(4 rows)
 
