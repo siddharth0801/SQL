@@ -192,3 +192,84 @@ Hotwax_SQL=# select snum,sname,Max(amt) from Salespeople Natural Join Orders whe
  1007 | Rifkin | 1098.16
 (4 rows)
 
+Hotwax_SQL=# select * from Customers where city=ANY(select city from Customers where snum=(select snum from Salespeople where sname='Serres'));
+ cnum |  cname   |  city   | rating | snum
+------+----------+---------+--------+------
+ 2003 | Liu      | SanJose |    200 | 1002
+ 2004 | Grass    | Berlin  |    300 | 1002
+ 2008 | Cisneros | SanJose |    300 | 1007
+(3 rows)
+
+Hotwax_SQL=# select * from Customers where rating>200;
+ cnum |  cname   |  city   | rating | snum
+------+----------+---------+--------+------
+ 2004 | Grass    | Berlin  |    300 | 1002
+ 2008 | Cisneros | SanJose |    300 | 1007
+(2 rows)
+
+Hotwax_SQL=# select count(Distinct(S.snum)) from Salespeople as S,Orders as O where S.snum=O.snum;
+ count
+-------
+     5
+(1 row)
+
+Hotwax_SQL=# select S.sname,C.cname,S.comm from Salespeople as S,Customers as C where S.snum=C.snum and S.comm>12;
+ sname  |  cname   | comm
+--------+----------+------
+ Serres | Liu      |   13
+ Serres | Grass    |   13
+ Rifkin | Cisneros |   15
+(3 rows)
+
+Hotwax_SQL=# select S.sname from Salespeople as S,Customers as C where S.snum=C.snum group by S.snum having count(S.snum)>1;
+ sname
+--------
+ Serres
+ Peel
+(2 rows)
+
+Hotwax_SQL=# select DISTINCT(S.sname) from Salespeople as S,Customers as C where S.snum=C.snum and S.city=C.city;
+ sname
+--------
+ Peel
+ Serres
+(2 rows)
+
+Hotwax_SQL=# select * from Salespeople where sname like 'P%' and sname like '___l%';
+ snum | sname |  city  | comm
+------+-------+--------+------
+ 1001 | Peel  | London |   12
+(1 row)
+
+Hotwax_SQL=# select * from Orders where cnum=(select cnum from Customers where cname='Cisneros');
+ onum |   amt   |   odate    | cnum | snum
+------+---------+------------+------+------
+ 3001 |   18.69 | 1990-10-03 | 2008 | 1007
+ 3006 | 1098.16 | 1990-10-03 | 2008 | 1007
+(2 rows)
+
+Hotwax_SQL=# select snum,sname,Max(amt) from Salespeople Natural Join Orders where sname='Serres' or sname='Rifkin' group by snum;
+ snum | sname  |   max
+------+--------+---------
+ 1002 | Serres | 5160.45
+ 1007 | Rifkin | 1098.16
+(2 rows)
+
+Hotwax_SQL=# select * from Salespeople order by snum,sname,comm,city;
+ snum |  sname  |   city    | comm
+------+---------+-----------+------
+ 1001 | Peel    | London    |   12
+ 1002 | Serres  | SanJose   |   13
+ 1003 | AxelRod | New York  |   10
+ 1004 | Motika  | London    |   11
+ 1007 | Rifkin  | Barcelona |   15
+ 1008 | Fran    | London    |   25
+(6 rows)
+
+Hotwax_SQL=# select * from Customers where cname between 'A' and 'G';
+ cnum |  cname   |  city   | rating | snum
+------+----------+---------+--------+------
+ 2006 | Clemens  | London  |    100 | 1001
+ 2008 | Cisneros | SanJose |    300 | 1007
+(2 rows)
+
