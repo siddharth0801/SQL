@@ -1,0 +1,145 @@
+Hotwax_SQL=# select city,Max(rating) from Customers group by city;
+  city   | max
+---------+-----
+ Rome    | 200
+ SanJose | 300
+ Berlin  | 300
+ London  | 100
+(4 rows)
+
+Hotwax_SQL=# select sname,comm,comm*amt/100.0 as Commision,cnum from Salespeople as S,Orders as O where S.snum=O.snum and cnum= ANY(select cnum from Customers where rating>100);
+  sname  | comm |     commision      | cnum
+---------+------+--------------------+------
+ Rifkin  |   15 |             2.8035 | 2008
+ Serres  |   13 |  670.8584999999999 | 2003
+ Rifkin  |   15 | 164.72400000000002 | 2008
+ AxelRod |   10 | 171.32299999999998 | 2002
+ Serres  |   13 |             9.8475 | 2004
+ Serres  |   13 | 170.29350000000002 | 2004
+(6 rows)
+
+Hotwax_SQL=# select count(cnum) from Customers where rating>(select Avg(rating) from Customers where city='SanJose');
+ count
+-------
+     2
+(1 row)
+
+Hotwax_SQL=# select * from Salespeople where city='Barcelona' or city='London';
+ snum | sname  |   city    | comm
+------+--------+-----------+------
+ 1001 | Peel   | London    |   12
+ 1004 | Motika | London    |   11
+ 1007 | Rifkin | Barcelona |   15
+ 1008 | Fran   | London    |   25
+(4 rows)
+
+Hotwax_SQL=# select S.snum,S.sname from Salespeople S,Customers C where S.snum=C.snum group by S.snum having count(cnum)=1;
+ snum |  sname
+------+---------
+ 1003 | AxelRod
+ 1004 | Motika
+ 1007 | Rifkin
+(3 rows)
+
+Hotwax_SQL=# select * from Customers as c1,Customers as c2 where not c1.cnum=c2.cnum and c1.snum=c2.snum;
+ cnum |  cname  |  city   | rating | snum | cnum |  cname  |  city   | rating | snum
+------+---------+---------+--------+------+------+---------+---------+--------+------
+ 2001 | Hoffman | London  |    100 | 1001 | 2006 | Clemens | London  |    100 | 1001
+ 2003 | Liu     | SanJose |    200 | 1002 | 2004 | Grass   | Berlin  |    300 | 1002
+ 2004 | Grass   | Berlin  |    300 | 1002 | 2003 | Liu     | SanJose |    200 | 1002
+ 2006 | Clemens | London  |    100 | 1001 | 2001 | Hoffman | London  |    100 | 1001
+(4 rows)
+
+Hotwax_SQL=# select * from Orders where amt>1000.0;
+ onum |   amt   |   odate    | cnum | snum
+------+---------+------------+------+------
+ 3002 |  1900.1 | 1990-10-03 | 2007 | 1004
+ 3005 | 5160.45 | 1990-10-03 | 2003 | 1002
+ 3006 | 1098.16 | 1990-10-03 | 2008 | 1007
+ 3009 | 1713.23 | 1990-10-04 | 2002 | 1003
+ 3008 |    4723 | 1990-10-05 | 2006 | 1001
+ 3010 | 1309.95 | 1990-10-06 | 2004 | 1002
+ 3011 | 9891.88 | 1990-10-06 | 2006 | 1001
+(7 rows)
+
+Hotwax_SQL=# select onum,cname from Customers Natural Join Orders;
+ onum |  cname
+------+----------
+ 3001 | Cisneros
+ 3003 | Hoffman
+ 3002 | Pereira
+ 3005 | Liu
+ 3006 | Cisneros
+ 3009 | Giovanni
+ 3007 | Grass
+ 3008 | Clemens
+ 3010 | Grass
+ 3011 | Clemens
+(10 rows)
+
+Hotwax_SQL=# select * from Customers where rating >=ANY(select rating from Customers where snum=ANY(select snum from Salespeople where sname='Serres'));
+ cnum |  cname   |  city   | rating | snum
+------+----------+---------+--------+------
+ 2002 | Giovanni | Rome    |    200 | 1003
+ 2003 | Liu      | SanJose |    200 | 1002
+ 2004 | Grass    | Berlin  |    300 | 1002
+ 2008 | Cisneros | SanJose |    300 | 1007
+(4 rows)
+
+Hotwax_SQL=# select * from Orders where odate='04/10/1990' or odate='03/10/1990';
+ onum |   amt   |   odate    | cnum | snum
+------+---------+------------+------+------
+ 3001 |   18.69 | 1990-10-03 | 2008 | 1007
+ 3003 |  767.19 | 1990-10-03 | 2001 | 1001
+ 3002 |  1900.1 | 1990-10-03 | 2007 | 1004
+ 3005 | 5160.45 | 1990-10-03 | 2003 | 1002
+ 3006 | 1098.16 | 1990-10-03 | 2008 | 1007
+ 3009 | 1713.23 | 1990-10-04 | 2002 | 1003
+ 3007 |   75.75 | 1990-10-04 | 2004 | 1002
+(7 rows)
+
+Hotwax_SQL=# select * from Customers where rating > ALL(select rating from Customers where city='Rome');
+ cnum |  cname   |  city   | rating | snum
+------+----------+---------+--------+------
+ 2004 | Grass    | Berlin  |    300 | 1002
+ 2008 | Cisneros | SanJose |    300 | 1007
+(2 rows)
+
+Hotwax_SQL=# select * from Customers where city='Rome' or  not rating<=100;
+ cnum |  cname   |  city   | rating | snum
+------+----------+---------+--------+------
+ 2002 | Giovanni | Rome    |    200 | 1003
+ 2003 | Liu      | SanJose |    200 | 1002
+ 2004 | Grass    | Berlin  |    300 | 1002
+ 2008 | Cisneros | SanJose |    300 | 1007
+ 2007 | Pereira  | Rome    |    100 | 1004
+(5 rows)
+
+Hotwax_SQL=# select * from Customers where snum=1001;
+ cnum |  cname  |  city  | rating | snum
+------+---------+--------+--------+------
+ 2001 | Hoffman | London |    100 | 1001
+ 2006 | Clemens | London |    100 | 1001
+(2 rows)
+
+Hotwax_SQL=# select snum,sname,Sum(amt) from Salespeople Natural Join Orders group by snum having Sum(amt)>(select Max(amt) from Orders);
+ snum | sname |   sum
+------+-------+----------
+ 1001 | Peel  | 15382.07
+(1 row)
+
+Hotwax_SQL=# select * from Orders;
+ onum |   amt   |   odate    | cnum | snum
+------+---------+------------+------+------
+ 3001 |   18.69 | 1990-10-03 | 2008 | 1007
+ 3003 |  767.19 | 1990-10-03 | 2001 | 1001
+ 3002 |  1900.1 | 1990-10-03 | 2007 | 1004
+ 3005 | 5160.45 | 1990-10-03 | 2003 | 1002
+ 3006 | 1098.16 | 1990-10-03 | 2008 | 1007
+ 3009 | 1713.23 | 1990-10-04 | 2002 | 1003
+ 3007 |   75.75 | 1990-10-04 | 2004 | 1002
+ 3008 |    4723 | 1990-10-05 | 2006 | 1001
+ 3010 | 1309.95 | 1990-10-06 | 2004 | 1002
+ 3011 | 9891.88 | 1990-10-06 | 2006 | 1001
+(10 rows)
+
